@@ -9,7 +9,9 @@ var history = document.getElementById('historybtn');
 var api = "http://api.openweathermap.org";
 var apiKey = "d91f911bcf2c0f925fb6535547a5ddc9"
 
-// Day JS
+// Add timezone plugins to day.js
+dayjs.extend(window.dayjs_plugin_utc);
+dayjs.extend(window.dayjs_plugin_timezone);
 
 // Functions and their purposes:
 // #1 Take value of input - validate city
@@ -78,7 +80,7 @@ function currentWeather(city, weather, timezone) {
     var wind = weather.wind_speed;
     var humidity = weather.humidiy;
     var uvi = weather.uvi;
-    var iconUrl = `https://openweathermap.org/img/w/${weather.weather[0].icon}.png`; 
+    var iconUrl = `https://openweathermap.org/img/w/${weather.weather[0].icon}.png`;
     var iconDescription = weather.weather[0].description || weather[0].main;
 
     var card = document.createElement("div");
@@ -107,14 +109,38 @@ function currentWeather(city, weather, timezone) {
     title.append(iconImg);
 
     // create text content of data into the card areas
+    tempEl.textContent = `Temp: ${temp}F`;
+    windEl.textContent = `Wind: ${wind}MPH`;
+    humidityEl.textContent = `Humidity: ${humidity}%`;
+    uviEl.textContent = `UV Index: `;
+    
     // append data into card body
+    cardBody.append(title, tempEl, windEl, humidityEl);
 
     // UV index- create text
-    // uviBadge.classList.add("btn", "btn-sm")
+    // uviEl.textContent = weather.uvi;
 
-    // CSS - call out 3 classes in CSS (past, present, future) - look at readme
+    // uviBadge.classList.add("btn", "btn-sm")
+    uviBadge.classList.add("btn", "btn-sm");
+
+    // CSS - call out 3 classes in CSS (safe, okay, danger for UVI) - look at readme
     // if comparison to determine past, present, future - add uvi text to button/ append
-    
+    // safe = 3, okay = 7, else = danger
+    if (uvi < 3) {
+        uviBadge.classList.add("btn-success");
+    } else if (uvi < 7) {
+        uviBadge.classList.add("btn-warning");
+    } else {
+        uviBadge.classList.add("btn-danger");
+    }
+
+    uviBadge.textContent = uvi;
+    uviEl.append(uviBadge);
+    cardBody.append(uviEl);
+
+    currentDay.innerHTML = '';
+    currentDay.append(card);
+};
 
 // // #5 Forecast (iterate through array of 5 days - call out a function for the card)
 function forecastWeather(forecast, timezone) {
@@ -131,8 +157,7 @@ function forecastWeather(forecast, timezone) {
 searchBtn.addEventListener('click', searchForm);
 
 
-
-
+console.log("hello");
 // Get other API
 // weather: https://api.openweathermap.org/data/3.0/onecall?lat=33.44&lon=-94.04&exclude=hourly,daily&appid={API key}
 // city coordinates:  http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid={API key}
