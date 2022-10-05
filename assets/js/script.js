@@ -143,9 +143,74 @@ function currentWeather(city, weather, timezone) {
 };
 
 // // #5 Forecast (iterate through array of 5 days - call out a function for the card)
-function forecastWeather(forecast, timezone) {
+function forecastWeather(dailyForecast, timezone) {
+    console.log(forecastWeather);
+    var startDay = dayjs().tz(timezone).add(1, "day").startOf("day").unix();
+    var endDay = dayjs().tz(timezone).add(6, "day").startOf("day").unix();
+    var heading = document.createElement("h3");
+    var headingCol = document.createElement("div");
+
+    headingCol.setAttribute("class", "col-12");
+    heading.textContent = "5 Day Forecast";
+    headingCol.append(heading);
+    forecast.append(headingCol);
+
+    for (let i = 0; i < dailyForecast.length; i++) {
+        // const element = array[i];
+        if (dailyForecast[i].dt >= startDay && dailyForecast[i].dt < endDay) {
+            forecastWeatherCard(dailyForecast[i], timezone);
+        }
+    }
+}
+
+function forecastWeatherCard(forecast, timezone) {
+    console.log(forecastWeatherCard);
     // look at demo to review what needs to be coded here
     // iterating through the index  of daily (for loop - calling out the card)
+   // var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    var unixTs = forecast.dt;
+    var temp = forecast.temp.day;
+    var wind = forecast.wind_speed;
+    var {humidity} = forecast;
+    var iconUrl = `https://openweathermap.org/img/w/${forecast.weather[0].icon}.png`;
+    var iconDescription = forecast.weather[0].description || weather[0].main;
+    var col = document.createElement("div");
+    var card = document.createElement("div");
+    var cardBody = document.createElement("div");
+    var title = document.createElement("h5");
+    var iconImg = document.createElement("img");
+    var tempEl = document.createElement("p");
+    var windEl = document.createElement("p");
+    var humidityEl = document.createElement("p");
+    
+    col.append(card);
+    card.setAttribute("class", "card bg-primary h-100 text-white");
+    cardBody.setAttribute("class", "card-body p-2");
+    card.append(cardBody);
+    cardBody.append(title, iconUrl, tempEl, windEl, humidityEl);
+    col.setAttribute("class", "col-md five-day-card");
+
+    title.setAttribute("class", "card-title");
+    tempEl.setAttribute("class", "card-text");
+    windEl.setAttribute("class", "card-text");
+    humidityEl.setAttribute("class", "card-text");
+
+    title.textContent = dayjs.unix(unixTs).tz(timezone).format("M/D/YYYY");
+    iconImg.setAttribute("src", iconUrl);
+    iconImg.setAttribute("alt", iconDescription);
+    //iconImg.setAttribute("class", "card-img");
+   // title.append(iconImg);
+
+    // create text content of data into the card areas
+    tempEl.textContent = `Temp: ${temp}F`;
+    windEl.textContent = `Wind: ${wind}MPH`;
+    humidityEl.textContent = `Humidity: ${humidity}%`;
+
+    // append data into card body
+    //cardBody.append(title, tempEl, windEl, humidityEl);
+
+    //forecastWeather.innerHTML = '';
+    forecast.append(col);
 }
 
 
@@ -157,7 +222,6 @@ function forecastWeather(forecast, timezone) {
 searchBtn.addEventListener('click', searchForm);
 
 
-console.log("hello");
 // Get other API
 // weather: https://api.openweathermap.org/data/3.0/onecall?lat=33.44&lon=-94.04&exclude=hourly,daily&appid={API key}
 // city coordinates:  http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid={API key}
